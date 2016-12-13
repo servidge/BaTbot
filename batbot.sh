@@ -1,83 +1,43 @@
-
 #!/bin/bash
 
 # BaTbot current version
-VERSION="1.4.3"
+VERSION="1.4.3-ITA by eliafino"
 
-# default token and chatid
-# or run BaTbot with option: -t <token>
-TELEGRAMTOKEN="<your telegram token>";
+TELEGRAMTOKEN="< token del BOT >";
+PERSONALID="< ID utente personale >";
 
-# how many seconds between check for new messages
-# or run Batbot with option: -c <seconds>
-CHECKNEWMSG=5;
+# controllo nuovi messaggi ogni:
+CHECKNEWMSG=1;
 
 # Commands
 # you have to use this exactly syntax: ["/mycommand"]='<system command>'
 # please, don't forget to remove all example commands!
 
-declare -A botcommands
-botcommands=(
-
-	["/start"]='echo "Hi @FIRSTNAME, pleased to meet you :)"'
-
-	["/myid"]='echo Your user id is: @USERID'
-
-	["/myuser"]='echo Your username is: @USERNAME'
-
-	["/ping ([a-zA-Z0-9]+)"]='echo Pong: @R1'
-
-	["/uptime"]="uptime"
-
+declare -A botcommands=(
+	["/run (.*)"]="exec @R1"
 )
 
-# + end config
-# +
-# +
-# +
-
 FIRSTTIME=0;
-BOTPATH="`dirname \"$0\"`";
-
-echo "+"
-while getopts :ht:c: OPTION; do
-	case $OPTION in
-		h)
-			echo " BaTbot: Bash Telegram Bot"
-			echo "+"
-			echo " Usage: ${0} [-t <token>] [-c <seconds>]"
-			exit;
-		;;
-		t)
-			echo "Set Token to: ${OPTARG}";
-			TELEGRAMTOKEN=$OPTARG;
-		;;
-		c)
-			echo "Check for new messages every: ${OPTARG} seconds";
-			CHECKNEWMSG=$OPTARG;
-		;;
-	esac
-done
-echo "+"
-
-echo -e "\nInitializing BaTbot v${VERSION}"
+BOTPATH="/root";
+ALLOWEDUSER="/etc/allowed_users";
+echo -e "\nAvvio BaTbot v${VERSION}\n"
 ABOUTME=`curl -s "https://api.telegram.org/bot${TELEGRAMTOKEN}/getMe"`
 if [[ "$ABOUTME" =~ \"ok\"\:true\, ]]; then
 	if [[ "$ABOUTME" =~ \"username\"\:\"([^\"]+)\" ]]; then
-		echo -e "Username: ${BASH_REMATCH[1]}";
+		echo -e "Nome BOT:\t ${BASH_REMATCH[1]}";
 	fi
 
 	if [[ "$ABOUTME" =~ \"first_name\"\:\"([^\"]+)\" ]]; then
-		echo -e "First name: ${BASH_REMATCH[1]}";
+		echo -e "Nome Utente:\t ${BASH_REMATCH[1]}";
 	fi
 
 	if [[ "$ABOUTME" =~ \"id\"\:([0-9\-]+), ]]; then
-		echo "Bot ID: ${BASH_REMATCH[1]}";
+		echo -e "Bot ID:\t\t ${BASH_REMATCH[1]}";
 		BOTID=${BASH_REMATCH[1]};
 	fi
 
 else
-	echo "Error: maybe wrong token... exit.";
+	echo "Errore: forse token sbagliato... esco.";
 	exit;
 fi
 
@@ -88,7 +48,7 @@ else
 	FIRSTTIME=1;
 fi
 
-echo -e "Done. Waiting for new messages...\n"
+echo -e "\nBene... aspetto nuovi messaggi.\n"
 
 while true; do
 	MSGOUTPUT=$(curl -s "https://api.telegram.org/bot${TELEGRAMTOKEN}/getUpdates");
@@ -130,35 +90,53 @@ while true; do
 		if [[ $MSGID -ne 0 && $CHATID -ne 0 ]]; then
 			LASTMSGID=$(cat "${BOTID}.lastmsg");
 			if [[ $MSGID -gt $LASTMSGID ]]; then
-				FIRSTNAMEUTF8=$(echo -e "$FIRSTNAME");
-				echo "[chat ${CHATID}][from ${FROMID}] <${USERNAME} - ${FIRSTNAMEUTF8} ${LASTNAME}> ${TEXT}";
-				echo $MSGID > "${BOTID}.lastmsg";
+				if [[ $(echo ${botcommands[$TEXT]}) != "" ]]; then
+					FIRSTNAMEUTF8=$(echo -e "$FIRSTNAME");
+					echo "[chat ${CHATID}][da ${FROMID}] <${FIRSTNAMEUTF8} ${LASTNAME}> ${TEXT}";
+					echo $MSGID > "${BOTID}.lastmsg";
 
-				for s in "${!botcommands[@]}"; do
-					if [[ "$TEXT" =~ ${s} ]]; then
-						CMDORIG=${botcommands["$s"]};
-						CMDORIG=${CMDORIG//@USERID/$FROMID};
-						CMDORIG=${CMDORIG//@USERNAME/$USERNAME};
-						CMDORIG=${CMDORIG//@FIRSTNAME/$FIRSTNAMEUTF8};
-						CMDORIG=${CMDORIG//@LASTNAME/$LASTNAME};
-						CMDORIG=${CMDORIG//@CHATID/$CHATID};
-						CMDORIG=${CMDORIG//@MSGID/$MSGID};
-						CMDORIG=${CMDORIG//@TEXT/$TEXT};
-						CMDORIG=${CMDORIG//@FROMID/$FROMID};
-						CMDORIG=${CMDORIG//@R1/${BASH_REMATCH[1]}};
-						CMDORIG=${CMDORIG//@R2/${BASH_REMATCH[2]}};
-						CMDORIG=${CMDORIG//@R3/${BASH_REMATCH[3]}};
+					for s in "${!botcommands[@]}"; do
+						if [[ "$TEXT" =~ ${s} ]]; then
+							CMDORIG=${botcommands["$s"]};
+							CMDORIG=${CMDORIG//@USERID/$FROMID};
+							CMDORIG=${CMDORIG//@USERNAME/$USERNAME};
+							CMDORIG=${CMDORIG//@FIRSTNAME/$FIRSTNAMEUTF8};
+							CMDORIG=${CMDORIG//@LASTNAME/$LASTNAME};
+							CMDORIG=${CMDORIG//@CHATID/$CHATID};
+							CMDORIG=${CMDORIG//@MSGID/$MSGID};
+							CMDORIG=${CMDORIG//@TEXT/$TEXT};
+							CMDORIG=${CMDORIG//@FROMID/$FROMID};
+							CMDORIG=${CMDORIG//@R1/${BASH_REMATCH[1]}};
+							CMDORIG=${CMDORIG//@R2/${BASH_REMATCH[2]}};
+							CMDORIG=${CMDORIG//@R3/${BASH_REMATCH[3]}};
 
-						echo "Command ${s} received, running cmd: ${CMDORIG}"
-						CMDOUTPUT=`$CMDORIG`;
+							#check if the user is allowed to send system commands
+							UserAllowed=$(grep "@${FROMID};" $ALLOWEDLIST |wc -l)
+						
+							if [[ $UserAllowed -eq 1 ]]; then
+								echo "Comando ${s} ricevuto, eseguo: ${CMDORIG}"
+								CMDOUTPUT=`$CMDORIG`;
+							else
+								CMDOUTPUT="BOT Privato."
+								echo "Utente non abilitato: Comando ${s} ricevuto da ${FIRSTNAMEUTF8}"
+								curl -s -d "text=Utente non abilitato: Comando ${s} ricevuto da ${FIRSTNAMEUTF8}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+							fi
 
-						if [ $FIRSTTIME -eq 1 ]; then
-							echo "old message, i will not send any answer to user.";
-						else
-							curl -s -d "text=${CMDOUTPUT}&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
+							if [ $FIRSTTIME -eq 1 ]; then
+								echo "Messaggio vecchio, nessuna risposta all'utente.";
+							elif [[ $UserAllowed -eq 1 ]]; then
+								curl -s -d "text=${CMDOUTPUT}&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
+								curl -s -d "text=Comando ${s} ricevuto da ${FIRSTNAMEUTF8}, eseguo: ${CMDORIG}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+							fi
 						fi
-					fi
-				done
+					done
+				else
+					echo "Comando $TEXT non riconosciuto."
+					echo $MSGID > "${BOTID}.lastmsg";
+					curl -s -d "text=Comando $TEXT non riconosciuto.&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
+					curl -s -d "text=Comando $TEXT non riconosciuto inviato da ${FIRSTNAMEUTF8}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+
+				fi
 			fi
 		fi
 	done
@@ -175,6 +153,7 @@ while true; do
 		MSGSEND=${BASH_REMATCH[2]};
 		curl -s -d "text=${MSGSEND}&chat_id=@${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
 	fi
+
 
 done
 
