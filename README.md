@@ -5,6 +5,12 @@ that can reply to user messages, execute commands,
 and others cool features.
 
 ## CHANGELOG
+**v1.4.3-ITA by eliafino**
+- add allowed user by @do2sz
+- add notify of commands sended to personal user ID
+- add notify to not understanding command sended
+- comments and messages in italian language
+
 **v1.4.3**
 - fixed regex commands match
 
@@ -24,12 +30,7 @@ and others cool features.
 
 ## Usage
 ```
-./botbat.sh [-t "<token>"] [-c <seconds>]
-
-./botbat.sh -h
-```
-- `-t  ` Set Telegram Bot Token (see https://core.telegram.org/bots/api)
-- `-c  ` Check for new messages every (n) seconds
+./botbat.sh
 
 ## Simple Commands
 inside the script botbat.sh you will find a list of example commands
@@ -72,13 +73,13 @@ BaTbot show in console, and in real time, all received messages:
 ```
 +
 Set Token to: ****
-Check for new messages every: 3 seconds
+Check for new messages every: 1 seconds
 +
 
-Initializing BaTbot v1.2
-Username: wafblue_bot
-First name: wafblue
-Bot ID: ****
+Initializing BaTbot v1.4.3
+Username:	wafblue_bot
+First name:	wafblue
+Bot ID:		****
 Done. Waiting for new messages...
 
 [chat **, from  **] <theMiddle - Andrea Menin> \/hello
