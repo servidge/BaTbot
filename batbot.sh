@@ -121,8 +121,8 @@ while true; do
 							CMDORIG=${CMDORIG//@R2/${BASH_REMATCH[2]}};
 							CMDORIG=${CMDORIG//@R3/${BASH_REMATCH[3]}};
 
-							#check if the user is allowed to send system commands
-							UserAllowed=$(grep "@${FROMID};" $ALLOWEDLIST |wc -l)
+							#controllo se l'utente è autorizzato
+							UserAllowed=$(grep "@${FROMID};" $ALLOWEDUSER |wc -l)
 						
 							if [[ $UserAllowed -eq 1 ]]; then
 								echo "Comando ${s} ricevuto, eseguo: ${CMDORIG}"
