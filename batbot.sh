@@ -3,23 +3,34 @@
 # BaTbot current version
 VERSION="1.4.3-ITA by eliafino"
 
+# Inserire il token del BOT restituito da BotFather
 TELEGRAMTOKEN="< token del BOT >";
+
+# Inserire l'ID dell'utente per le notifiche di uso
 PERSONALID="< ID utente personale >";
+
+# creare il file allowed_users specificando gli ID degli utenti autorizzati all'invio dei comandi. Usare questo formato "@USERNAME1;@USERNAME2;@USERNAME3;"
+ALLOWEDUSER="/etc/allowed_users";
 
 # controllo nuovi messaggi ogni:
 CHECKNEWMSG=1;
 
-# Commands
-# you have to use this exactly syntax: ["/mycommand"]='<system command>'
-# please, don't forget to remove all example commands!
+# Comandi
+# rispettare questo formato: ["/miocomando"]='<system command>'
+# per favore, ricordarsi di rimuovere gli esempi non necessari
+# Per aggiungere questi comandi nei comandi personalizzati,
+# usare la funzione /setcommands in BotFather
 
 declare -A botcommands=(
-	["/run (.*)"]="exec @R1"
+	["/start"]='echo "Hi @FIRSTNAME, pleased to meet you :)"'
+	["/myid"]='echo Your user id is: @USERID'
+	["/myuser"]='echo Your username is: @USERNAME'
+	["/ping ([a-zA-Z0-9]+)"]='echo Pong: @R1'
+	["/uptime"]="uptime"
 )
 
 FIRSTTIME=0;
 BOTPATH="/root";
-ALLOWEDUSER="/etc/allowed_users";
 echo -e "\nAvvio BaTbot v${VERSION}\n"
 ABOUTME=`curl -s "https://api.telegram.org/bot${TELEGRAMTOKEN}/getMe"`
 if [[ "$ABOUTME" =~ \"ok\"\:true\, ]]; then
