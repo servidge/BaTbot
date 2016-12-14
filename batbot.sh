@@ -125,7 +125,7 @@ while true; do
 							CMDORIG=${CMDORIG//@R2/${BASH_REMATCH[2]}};
 							CMDORIG=${CMDORIG//@R3/${BASH_REMATCH[3]}};
 
-							#check if the user is allowed to send system commands
+							#controllo se l'utente è autorizzato
 							UserAllowed=$(grep "@${FROMID};" $ALLOWEDUSER |wc -l)
 						
 							if [[ $UserAllowed -eq 1 ]]; then
@@ -149,7 +149,7 @@ while true; do
 					FIRSTNAMEUTF8=$(echo -e "$FIRSTNAME");
 					echo $MSGID > "${BOTID}.lastmsg";
 
-					#check if the user is allowed to send system commands
+					#controllo se l'utente è autorizzato
 					UserAllowed=$(grep "@${FROMID};" /etc/allowed_users |wc -l)
 				
 					if [[ $UserAllowed -eq 1 ]]; then
