@@ -56,10 +56,10 @@ else
 	exit;
 fi
 
-if [ -e "${MSGPATHN}/${BOTID}.lastmsg" ]; then
+if [ -e "${NMSGPATH}/${BOTID}.lastmsg" ]; then
 	FIRSTTIME=0;
 else
-	touch ${MSGPATHN}/${BOTID}.lastmsg;
+	touch ${NMSGPATH}/${BOTID}.lastmsg;
 	FIRSTTIME=1;
 fi
 
