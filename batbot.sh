@@ -14,7 +14,7 @@ ALLOWEDUSER="/etc/allowed_users";
 
 # directory dove tenere l'elenco dei messaggi ricevuti,
 # per non processare anche quelli vecchi
-MSGPATHN="/root";
+NMSGPATH="/root";
 
 # controllo nuovi messaggi ogni:
 CHECKNEWMSG=1;
