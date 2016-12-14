@@ -6,11 +6,15 @@ VERSION="1.4.3-ITA by eliafino"
 # Inserire il token del BOT restituito da BotFather
 TELEGRAMTOKEN="< token del BOT >";
 
-# Inserire l'ID dell'utente per le notifiche di uso
-PERSONALID="< ID utente personale >";
+# Inserire l'ID dell'utente master per le notifiche di uso
+PERSONALID="< ID utente master >";
 
 # creare il file allowed_users specificando gli ID degli utenti autorizzati all'invio dei comandi. Usare questo formato "@USERNAME1;@USERNAME2;@USERNAME3;"
 ALLOWEDUSER="/etc/allowed_users";
+
+# directory dove tenere l'elenco dei messaggi ricevuti,
+# per non processare anche quelli vecchi
+MSGPATHN="/root";
 
 # controllo nuovi messaggi ogni:
 CHECKNEWMSG=1;
@@ -30,7 +34,6 @@ declare -A botcommands=(
 )
 
 FIRSTTIME=0;
-BOTPATH="/root";
 
 echo -e "\nAvvio BaTbot v${VERSION}\n"
 ABOUTME=`curl -s "https://api.telegram.org/bot${TELEGRAMTOKEN}/getMe"`
@@ -53,10 +56,10 @@ else
 	exit;
 fi
 
-if [ -e "${BOTPATH}/${BOTID}.lastmsg" ]; then
+if [ -e "${MSGPATHN}/${BOTID}.lastmsg" ]; then
 	FIRSTTIME=0;
 else
-	touch ${BOTPATH}/${BOTID}.lastmsg;
+	touch ${MSGPATHN}/${BOTID}.lastmsg;
 	FIRSTTIME=1;
 fi
 
