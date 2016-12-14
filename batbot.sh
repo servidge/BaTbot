@@ -135,14 +135,18 @@ while true; do
 							else
 								CMDOUTPUT="BOT Privato. Non sei autorizzato!"
 								echo "Utente non abilitato: Comando ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8}"
-								curl -s -d "text=Utente non abilitato: Comando ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+								if [[ ${FROMID} != ${PERSONALID} ]]; then
+									curl -s -d "text=Utente non abilitato: Comando ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+								fi
 							fi
 
 							if [ $FIRSTTIME -eq 1 ]; then
 								echo "Messaggio vecchio, nessuna risposta all'utente.";
 							elif [[ $UserAllowed -eq 1 ]]; then
 								curl -s -d "text=${CMDOUTPUT}&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
-								curl -s -d "text=Comando ${s} ricevuto da ${FIRSTNAMEUTF8} ${FROMID}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+								if [[ ${FROMID} != ${PERSONALID} ]]; then
+									curl -s -d "text=Comando ${s} ricevuto da ${FIRSTNAMEUTF8} ${FROMID}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+								fi
 							fi
 						fi
 					done
@@ -151,16 +155,20 @@ while true; do
 					echo $MSGID > "${BOTID}.lastmsg";
 
 					#controllo se l'utente è autorizzato
-					UserAllowed=$(grep "@${FROMID};" /etc/allowed_users |wc -l)
+					UserAllowed=$(grep "@${FROMID};" $ALLOWEDUSER |wc -l)
 				
 					if [[ $UserAllowed -eq 1 ]]; then
 						echo "Comando $TEXT non riconosciuto."
 						curl -s -d "text=Comando $TEXT non riconosciuto.&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
-						curl -s -d "text=Comando $TEXT non riconosciuto inviato da ${FIRSTNAMEUTF8} ${FROMID}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+						if [[ ${FROMID} != ${PERSONALID} ]]; then
+							curl -s -d "text=Comando $TEXT non riconosciuto inviato da ${FIRSTNAMEUTF8} ${FROMID}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+						fi
 					else
 						echo "Utente non abilitato: Comando ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8}"
-						curl -s -d "text=Utente non abilitato: Comando ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
 						curl -s -d "text=Utente non abilitato&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
+						if [[ ${FROMID} != ${PERSONALID} ]]; then
+							curl -s -d "text=Utente non abilitato: Comando ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+						fi
 					fi
 				fi
 			fi
