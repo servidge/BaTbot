@@ -125,7 +125,7 @@ while true; do
 							CMDORIG=${CMDORIG//@R2/${BASH_REMATCH[2]}};
 							CMDORIG=${CMDORIG//@R3/${BASH_REMATCH[3]}};
 
-							#controllo se l'utente è autorizzato
+							#check if the user is allowed to send system commands
 							UserAllowed=$(grep "@${FROMID};" $ALLOWEDUSER |wc -l)
 						
 							if [[ $UserAllowed -eq 1 ]]; then
@@ -141,7 +141,7 @@ while true; do
 								echo "Messaggio vecchio, nessuna risposta all'utente.";
 							elif [[ $UserAllowed -eq 1 ]]; then
 								curl -s -d "text=${CMDOUTPUT}&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
-								curl -s -d "text=Comando ${s} ricevuto da ${FIRSTNAMEUTF8}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+								curl -s -d "text=Comando ${s} ricevuto da ${FIRSTNAMEUTF8} ${FROMID}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
 							fi
 						fi
 					done
@@ -149,13 +149,13 @@ while true; do
 					FIRSTNAMEUTF8=$(echo -e "$FIRSTNAME");
 					echo $MSGID > "${BOTID}.lastmsg";
 
-					#controllo se l'utente è autorizzato
+					#check if the user is allowed to send system commands
 					UserAllowed=$(grep "@${FROMID};" /etc/allowed_users |wc -l)
 				
 					if [[ $UserAllowed -eq 1 ]]; then
 						echo "Comando $TEXT non riconosciuto."
 						curl -s -d "text=Comando $TEXT non riconosciuto.&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
-						curl -s -d "text=Comando $TEXT non riconosciuto inviato da ${FIRSTNAMEUTF8}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+						curl -s -d "text=Comando $TEXT non riconosciuto inviato da ${FIRSTNAMEUTF8} ${FROMID}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
 					else
 						echo "Utente non abilitato: Comando ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8}"
 						curl -s -d "text=Utente non abilitato: Comando ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
