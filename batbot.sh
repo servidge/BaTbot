@@ -31,6 +31,7 @@ declare -A botcommands=(
 	["/myuser"]='echo Il tuo nome utente è: @USERNAME'
 	["/ping ([a-zA-Z0-9]+)"]='echo Pong: @R1'
 	["/uptime"]="uptime"
+#	["/run (.*)"]="exec @R1"
 )
 
 FIRSTTIME=0;
