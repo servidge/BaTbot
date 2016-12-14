@@ -1,4 +1,4 @@
-# BaTbot v1.4.3 - Bash Telegram Bot
+# BaTbot v1.4.3 - Bash Telegram BOT
 
 batbot.sh è un semplice BOT Telegram scritto in Bash
 che può rispondere ai messaggi degli utenti, eseguire comandi, 
