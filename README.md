@@ -6,6 +6,7 @@ e altre cose interessanti.
 
 ## CHANGELOG
 **v1.4.3-ITA by eliafino**
+- cambiato variabile BOTPATH in NMSGPATH e messo impostabile il percorso di salvataggio. Tiene conto dei messaggi inviati per non processare quelli vecchi.
 - aggiunto lista utenti accettati "allowed_user" by @do2sz
 - aggiunta la notifica all'utente master dei comandi inviati al BOT
 - aggiunta la notifica dell'invio di comandi non riconosciuti
@@ -29,7 +30,6 @@ e altre cose interessanti.
 - [TODO](#todo)
 
 ## Usage
-```
 ./botbat.sh
 
 ## Simple Commands
