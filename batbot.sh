@@ -26,9 +26,9 @@ CHECKNEWMSG=1;
 # usare la funzione /setcommands in BotFather
 
 declare -A botcommands=(
-	["/start"]='echo "Hi @FIRSTNAME, pleased to meet you :)"'
-	["/myid"]='echo Your user id is: @USERID'
-	["/myuser"]='echo Your username is: @USERNAME'
+	["/start"]='echo Ciao @FIRSTNAME'
+	["/myid"]='echo Il tuo user ID è: @USERID'
+	["/myuser"]='echo Il tuo nome utente è: @USERNAME'
 	["/ping ([a-zA-Z0-9]+)"]='echo Pong: @R1'
 	["/uptime"]="uptime"
 )
