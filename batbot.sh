@@ -4,20 +4,20 @@
 VERSION="1.4.3-ITA by eliafino"
 
 # Inserire il token del BOT restituito da BotFather
-TELEGRAMTOKEN="< token del BOT >";
+TELEGRAMTOKEN="< token del BOT >"
 
 # Inserire l'ID dell'utente master per le notifiche di uso
-PERSONALID="< ID utente master >";
+PERSONALID=" ID utente master "
 
-# creare il file allowed_users specificando gli ID degli utenti autorizzati all'invio dei comandi. Usare questo formato "@USERNAME1;@USERNAME2;@USERNAME3;"
-ALLOWEDUSER="/etc/allowed_users";
+# Creo directory utente
+BATBOTUSR=$HOME/.batbot
+mkdir -p $BATBOTUSR
 
-# directory dove tenere l'elenco dei messaggi ricevuti,
-# per non processare anche quelli vecchi
-NMSGPATH="/root";
+# creare il file allowed_users specificando gli ID degli utenti autorizzati all'invio dei comandi. Un ID per riga."
+ALLOWEDUSER=$BATBOTUSR/allowed_users
 
 # controllo nuovi messaggi ogni:
-CHECKNEWMSG=1;
+CHECKNEWMSG=1
 
 # Comandi
 # rispettare questo formato: ["/miocomando"]='<system command>'
@@ -26,148 +26,148 @@ CHECKNEWMSG=1;
 # usare la funzione /setcommands in BotFather
 
 declare -A botcommands=(
-	["/start"]='echo Ciao @FIRSTNAME'
-	["/myid"]='echo Il tuo user ID è: @USERID'
-	["/myuser"]='echo Il tuo nome utente è: @USERNAME'
+	["/start"]='exec userlist @USERID:@FIRSTNAME@LASTNAME'
+	["/myid"]='echo Il tuo user ID Ã¨: @USERID'
+	["/myuser"]='echo Il tuo nome utente Ã¨: @USERNAME'
 	["/ping ([a-zA-Z0-9]+)"]='echo Pong: @R1'
 	["/uptime"]="uptime"
+	["/add ([0-9]+)"]='exec admadduser @USERID @R1'
+	["/del ([0-9]+)"]='exec admdeluser @USERID @R1'
+	["/lista"]='exec admlistuser @USERID'
 #	["/run (.*)"]="exec @R1"
 )
 
-FIRSTTIME=0;
+FIRSTTIME=0
 
 echo -e "\nAvvio BaTbot v${VERSION}\n"
 ABOUTME=`curl -s "https://api.telegram.org/bot${TELEGRAMTOKEN}/getMe"`
 if [[ "$ABOUTME" =~ \"ok\"\:true\, ]]; then
 	if [[ "$ABOUTME" =~ \"username\"\:\"([^\"]+)\" ]]; then
-		echo -e "Nome BOT:\t ${BASH_REMATCH[1]}";
+		echo -e "Nome BOT:\t ${BASH_REMATCH[1]}"
 	fi
 
 	if [[ "$ABOUTME" =~ \"first_name\"\:\"([^\"]+)\" ]]; then
-		echo -e "Nome Utente:\t ${BASH_REMATCH[1]}";
+		echo -e "Nome Utente:\t ${BASH_REMATCH[1]}"
 	fi
 
 	if [[ "$ABOUTME" =~ \"id\"\:([0-9\-]+), ]]; then
-		echo -e "Bot ID:\t\t ${BASH_REMATCH[1]}";
+		echo -e "Bot ID:\t\t ${BASH_REMATCH[1]}"
 		BOTID=${BASH_REMATCH[1]};
 	fi
 
 else
-	echo "Errore: forse token sbagliato... esco.";
+	echo "Errore: forse token sbagliato... esco."
 	exit;
 fi
 
-if [ -e "${NMSGPATH}/${BOTID}.lastmsg" ]; then
+if [ -e "$BATBOTUSR/$BOTID.lastmsg" ]; then
 	FIRSTTIME=0;
 else
-	touch ${NMSGPATH}/${BOTID}.lastmsg;
+	touch $BATBOTUSR/$BOTID.lastmsg
 	FIRSTTIME=1;
 fi
 
 echo -e "\nBene... aspetto nuovi messaggi.\n"
 
 while true; do
-	MSGOUTPUT=$(curl -s "https://api.telegram.org/bot${TELEGRAMTOKEN}/getUpdates");
-	MSGID=0;
-	TEXT=0;
-	FIRSTNAME="";
-	LASTNAME="";
+	MSGOUTPUT=$(curl -s "https://api.telegram.org/bot${TELEGRAMTOKEN}/getUpdates")
+	MSGID=0
+	TEXT=0
+	FIRSTNAME=""
+	LASTNAME=""
 	echo -e "${MSGOUTPUT}" | while read -r line ; do
 		if [[ "$line" =~ \"chat\"\:\{\"id\"\:([\-0-9]+)\, ]]; then
-			CHATID=${BASH_REMATCH[1]};
+			CHATID=${BASH_REMATCH[1]}
 		fi
 
 		if [[ "$line" =~ \"message\_id\"\:([0-9]+)\, ]]; then
-			MSGID=${BASH_REMATCH[1]};
+			MSGID=${BASH_REMATCH[1]}
 		fi
 
 		if [[ "$line" =~ \"text\"\:\"([^\"]+)\" ]]; then
-			TEXT=${BASH_REMATCH[1]};
-			LASTLINERCVD=${line};
+			TEXT=${BASH_REMATCH[1]}
+			LASTLINERCVD=${line}
 		fi
 
 		if [[ "$line" =~ \"username\"\:\"([^\"]+)\" ]]; then
-			USERNAME=${BASH_REMATCH[1]};
+			USERNAME=${BASH_REMATCH[1]}
 		fi
 
 		if [[ "$line" =~ \"first_name\"\:\"([^\"]+)\" ]]; then
-			FIRSTNAME=${BASH_REMATCH[1]};
+			FIRSTNAME=${BASH_REMATCH[1]}
 		fi
 
 		if [[ "$line" =~ \"last_name\"\:\"([^\"]+)\" ]]; then
-			LASTNAME=${BASH_REMATCH[1]};
+			LASTNAME=${BASH_REMATCH[1]}
 		fi
 
 		if [[ "$line" =~ \"from\"\:\{\"id\"\:([0-9\-]+), ]]; then
-			FROMID="${BASH_REMATCH[1]}";
+			FROMID="${BASH_REMATCH[1]}"
 		fi
 
 
 		if [[ $MSGID -ne 0 && $CHATID -ne 0 ]]; then
-			LASTMSGID=$(cat "${BOTID}.lastmsg");
+			#controllo se l'utente Ã¨ autorizzato
+			UserAllowed=$(grep -x "${FROMID}" $ALLOWEDUSER |wc -l)
+			LASTMSGID=$(cat "${BOTID}.lastmsg")
+			FIRSTNAMEUTF8=$(echo -e "$FIRSTNAME")
 			if [[ $MSGID -gt $LASTMSGID ]]; then
 				if grep -qe "$(echo $TEXT | awk '{print $1}')" <(echo "${!botcommands[@]}"); then
-					FIRSTNAMEUTF8=$(echo -e "$FIRSTNAME");
-					echo "[chat ${CHATID}][da ${FROMID}] <${FIRSTNAMEUTF8} ${LASTNAME}> ${TEXT}";
-					echo $MSGID > "${BOTID}.lastmsg";
-
+					echo "[chat ${CHATID}][da ${FROMID}] <${FIRSTNAMEUTF8} ${LASTNAME}> ${TEXT}"
+					echo $MSGID > "${BOTID}.lastmsg"
 					for s in "${!botcommands[@]}"; do
 						if [[ "$TEXT" =~ ${s} ]]; then
-							CMDORIG=${botcommands["$s"]};
-							CMDORIG=${CMDORIG//@USERID/$FROMID};
-							CMDORIG=${CMDORIG//@USERNAME/$USERNAME};
-							CMDORIG=${CMDORIG//@FIRSTNAME/$FIRSTNAMEUTF8};
-							CMDORIG=${CMDORIG//@LASTNAME/$LASTNAME};
-							CMDORIG=${CMDORIG//@CHATID/$CHATID};
-							CMDORIG=${CMDORIG//@MSGID/$MSGID};
-							CMDORIG=${CMDORIG//@TEXT/$TEXT};
-							CMDORIG=${CMDORIG//@FROMID/$FROMID};
-							CMDORIG=${CMDORIG//@R1/${BASH_REMATCH[1]}};
-							CMDORIG=${CMDORIG//@R2/${BASH_REMATCH[2]}};
-							CMDORIG=${CMDORIG//@R3/${BASH_REMATCH[3]}};
+							CMDORIG=${botcommands["$s"]}
+							CMDORIG=${CMDORIG//@USERID/$FROMID}
+							CMDORIG=${CMDORIG//@USERNAME/$USERNAME}
+							CMDORIG=${CMDORIG//@FIRSTNAME/$FIRSTNAMEUTF8}
+							CMDORIG=${CMDORIG//@LASTNAME/$LASTNAME}
+							CMDORIG=${CMDORIG//@CHATID/$CHATID}
+							CMDORIG=${CMDORIG//@MSGID/$MSGID}
+							CMDORIG=${CMDORIG//@TEXT/$TEXT}
+							CMDORIG=${CMDORIG//@FROMID/$FROMID}
+							CMDORIG=${CMDORIG//@R1/${BASH_REMATCH[1]}}
+							CMDORIG=${CMDORIG//@R2/${BASH_REMATCH[2]}}
+							CMDORIG=${CMDORIG//@R3/${BASH_REMATCH[3]}}
 
-							#controllo se l'utente è autorizzato
-							UserAllowed=$(grep "@${FROMID};" $ALLOWEDUSER |wc -l)
-						
 							if [[ $UserAllowed -eq 1 ]]; then
 								echo "Comando ${s} ricevuto, eseguo: ${CMDORIG}"
-								CMDOUTPUT=`$CMDORIG`;
+								CMDOUTPUT=`$CMDORIG`
+								if [ $FIRSTTIME -eq 1 ]; then
+									echo "Messaggio vecchio, nessuna risposta all'utente."
+								else
+									curl -s -d "text=${CMDOUTPUT}&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
+									if [[ ${FROMID} != ${PERSONALID} ]]; then
+										curl -s -d "text=${s} ricevuto da ${FIRSTNAMEUTF8} ${LASTNAME} ${FROMID}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
+									fi
+								fi
 							else
 								CMDOUTPUT="BOT Privato. Non sei autorizzato!"
-								echo "Utente non abilitato: Comando ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8}"
-								if [[ ${FROMID} != ${PERSONALID} ]]; then
-									curl -s -d "text=Utente non abilitato: Comando ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
-								fi
-							fi
-
-							if [ $FIRSTTIME -eq 1 ]; then
-								echo "Messaggio vecchio, nessuna risposta all'utente.";
-							elif [[ $UserAllowed -eq 1 ]]; then
+								echo "Utente non in lista: ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8} ${LASTNAME}"
 								curl -s -d "text=${CMDOUTPUT}&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 								if [[ ${FROMID} != ${PERSONALID} ]]; then
-									curl -s -d "text=Comando ${s} ricevuto da ${FIRSTNAMEUTF8} ${FROMID}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+									curl -s -d "text=Utente non abilitato: ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8} ${LASTNAME}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
+								fi
+								if [[ ${s} == "/start" ]]; then
+									userlist ${FROMID}:${FIRSTNAMEUTF8}${LASTNAME}
 								fi
 							fi
 						fi
 					done
 				else
-					FIRSTNAMEUTF8=$(echo -e "$FIRSTNAME");
-					echo $MSGID > "${BOTID}.lastmsg";
-
-					#controllo se l'utente è autorizzato
-					UserAllowed=$(grep "@${FROMID};" $ALLOWEDUSER |wc -l)
-				
+					echo $MSGID > "${BOTID}.lastmsg"
 					if [[ $UserAllowed -eq 1 ]]; then
 						echo "Comando $TEXT non riconosciuto."
 						curl -s -d "text=Comando $TEXT non riconosciuto.&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 						if [[ ${FROMID} != ${PERSONALID} ]]; then
-							curl -s -d "text=Comando $TEXT non riconosciuto inviato da ${FIRSTNAMEUTF8} ${FROMID}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+							curl -s -d "text=$TEXT non riconosciuto ricevuto da ${FROMID} ${FIRSTNAMEUTF8} ${LASTNAME}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 						fi
 					else
-						echo "Utente non abilitato: Comando ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8}"
-						curl -s -d "text=Utente non abilitato&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
+						CMDOUTPUT="Non sei autorizzato ad eseguire questo comando!"
+						echo "Comando non abilitato: ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8}"
+						curl -s -d "text=${CMDOUTPUT}&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 						if [[ ${FROMID} != ${PERSONALID} ]]; then
-							curl -s -d "text=Utente non abilitato: Comando ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+							curl -s -d "text=Comando non abilitato: ${s} ricevuto da ${FROMID} ${FIRSTNAMEUTF8} ${LASTNAME}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 						fi
 					fi
 				fi
@@ -177,15 +177,15 @@ while true; do
 
 	FIRSTTIME=0;
 
-	read -t $CHECKNEWMSG answer;
+	read -t $CHECKNEWMSG answer
 	if [[ "$answer" =~ ^\.msg.([\-0-9]+).(.*) ]]; then
-		CHATID=${BASH_REMATCH[1]};
-		MSGSEND=${BASH_REMATCH[2]};
-		curl -s -d "text=${MSGSEND}&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+		CHATID=${BASH_REMATCH[1]}
+		MSGSEND=${BASH_REMATCH[2]}
+		curl -s -d "text=${MSGSEND}&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 	elif [[ "$answer" =~ ^\.msg.([a-zA-Z]+).(.*) ]]; then
-		CHATID=${BASH_REMATCH[1]};
-		MSGSEND=${BASH_REMATCH[2]};
-		curl -s -d "text=${MSGSEND}&chat_id=@${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null;
+		CHATID=${BASH_REMATCH[1]}
+		MSGSEND=${BASH_REMATCH[2]}
+		curl -s -d "text=${MSGSEND}&chat_id=@${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 	fi
 
 
