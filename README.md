@@ -31,10 +31,10 @@ Per la creazione del BOT fare riferimento ad una delle guide presenti in rete: h
 - [TODO](#todo)
 
 ## Usage
-./botbat.sh
+./botbat
 
 ## Simple Commands
-inside the script botbat.sh you will find a list of example commands
+inside the script botbat you will find a list of example commands
 that you can configure. For Example:
 ```
 	["/hello"]="echo Hi"
