@@ -96,6 +96,10 @@ while true; do
 			FIRSTNAME=${BASH_REMATCH[1]}
 		fi
 
+		if [[ "$line" != \"last_name\" ]]; then
+			LASTNAME="UnconfigureD";
+		fi
+
 		if [[ "$line" =~ \"last_name\"\:\"([^\"]+)\" ]]; then
 			LASTNAME=${BASH_REMATCH[1]}
 		fi
