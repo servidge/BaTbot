@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 # BaTbot current version
 VERSION="1.4.3-1 - ITA by eliafino"
@@ -115,12 +115,12 @@ while true; do
 		if [[ $MSGID -ne 0 && $CHATID -ne 0 ]]; then
 			#controllo se l'utente Ã¨ autorizzato
 			UserAllowed=$(grep -x "${FROMID}" $ALLOWEDUSER |wc -l)
-			LASTMSGID=$(cat "${BOTID}.lastmsg")
+			LASTMSGID=$(cat "$BATBOTUSR/${BOTID}.lastmsg")
 			FIRSTNAMEUTF8=$(echo -e "$FIRSTNAME")
 			if [[ $MSGID -gt $LASTMSGID ]]; then
 				if grep -qe "$(echo $TEXT | awk '{print $1}')" <(echo "${!botcommands[@]}"); then
 					echo "[chat ${CHATID}][da ${FROMID}] <${FIRSTNAMEUTF8} ${LASTNAME}> ${TEXT}"
-					echo $MSGID > "${BOTID}.lastmsg"
+					echo $MSGID > "$BATBOTUSR/${BOTID}.lastmsg"
 					for s in "${!botcommands[@]}"; do
 						if [[ "$TEXT" =~ ${s} ]]; then
 							DATENOW=$(date "+%s")
@@ -170,7 +170,7 @@ while true; do
 						fi
 					done
 				else
-					echo $MSGID > "${BOTID}.lastmsg"
+					echo $MSGID > "$BATBOTUSR/${BOTID}.lastmsg"
 					if [[ $UserAllowed -eq 1 ]]; then
 						echo "Comando $TEXT non riconosciuto."
 						curl -s -d "text=Comando $TEXT non riconosciuto.&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
