@@ -25,6 +25,7 @@ CHECKNEWMSG=1
 # usare la funzione /setcommands in BotFather
 
 declare -A botcommands=(
+	["notextmessage"]="echo Message Type not supported, just text; Tipo di messaggio non supportato, solo testo"
 	["/start"]='exec userlist @USERID:@FIRSTNAME@LASTNAME'
 	["/myid"]='echo Il tuo user ID Ã¨: @USERID'
 	["/myuser"]='echo Il tuo nome utente Ã¨: @USERNAME'
