@@ -83,6 +83,10 @@ while true; do
 			MSGID=${BASH_REMATCH[1]}
 		fi
 
+		if [[ "$line" != \"text\"\:\" ]]; then
+			TEXT="notextmessage"
+		fi
+
 		if [[ "$line" =~ \"text\"\:\"([^\"]+)\" ]]; then
 			TEXT=${BASH_REMATCH[1]}
 			LASTLINERCVD=${line}
