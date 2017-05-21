@@ -1,15 +1,15 @@
 #!/bin/bash
 
-ALLUSER=$HOME/.batbot/allowed_users
-ALLSUPUSER=$HOME/.batbot/allowed_superusers
+ALLUSER=.batbot/allowed_users
+ALLSUPUSER=.batbot/allowed_superusers
 
 if [[ $(grep -x "$1" $ALLSUPUSER |wc -l) -eq 1 ]]; then
 	if [[ $(grep -x "$2" $ALLUSER |wc -l) -eq 1 ]]; then
-		echo "Utente $2 già presente"
+		echo "User $2 already present"
 	else
 		echo $2 >> $ALLUSER
-		echo "Aggiunto utente: $2"
+		echo "Added User: $2"
 	fi
 else
-	echo "Non sei abilitato ad aggiungere utenti"
+	echo "You are not allowed to add users to the list"
 fi

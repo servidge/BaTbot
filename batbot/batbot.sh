@@ -25,14 +25,14 @@ CHECKNEWMSG=10
 # Use the function / setcommands in BotFather
 declare -A botcommands=(
 	["notextmessage"]="echo Message Type not supported, just text"
-	["/start"]='exec userlist @USERID:@FIRSTNAME@LASTNAME'
+	["/start"]='exec userlist.sh @USERID:@FIRSTNAME@LASTNAME'
 	["/myid"]='echo Your user id is: @USERID'
 	["/myuser"]='echo Your username is: @USERNAME'
 	["/ping ([a-zA-Z0-9]+)"]='echo Pong: @R1'
 	["/uptime"]="uptime"
-	["/add ([0-9]+)"]='exec admadduser @USERID @R1'
-	["/del ([0-9]+)"]='exec admdeluser @USERID @R1'
-	["/listuser"]='exec admlistuser @USERID'
+	["/add ([0-9]+)"]='exec admadduser.sh @USERID @R1'
+	["/del ([0-9]+)"]='exec admdeluser.sh @USERID @R1'
+	["/listuser"]='exec admlistuser.sh @USERID'
 #	["/run (.*)"]="exec @R1"
 )
 
@@ -166,7 +166,7 @@ while true; do
 										curl -s -d "text=User is not enabled: ${s} received from ${FIRSTNAMEUTF8} ${FROMID}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 									fi
 									if [[ ${s} == "/start" ]]; then
-										userlist ${FROMID}:${FIRSTNAMEUTF8}${LASTNAME}
+										userlist.sh ${FROMID}:${FIRSTNAMEUTF8}${LASTNAME}
 									fi
 								fi
 							fi
