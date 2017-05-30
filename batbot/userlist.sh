@@ -9,7 +9,7 @@ if [[ $@ =~ (.*)":"(.*) ]]; then
 	ID=${BASH_REMATCH[1]}
 	NAME=${BASH_REMATCH[2]}
 	#echo $ID1 $NAME1
-	if [[ $(grep $ID $USERLIST) == "" ]]; then
+	if [[ $(grep -c ^$ID: $USERLIST) == 0 ]]; then
 		echo "$ID:$NAME" >> $USERLIST
 	fi
 fi

@@ -4,7 +4,7 @@ ALLUSER=.batbot/allowed_users
 ALLSUPUSER=.batbot/allowed_superusers
 USERLIST=.batbot/user_list
 
-if [[ $(grep -x "$1" $ALLSUPUSER |wc -l) -eq 1 ]]; then
+if [[ $(grep -c -x "$1" $ALLSUPUSER) -eq 1 ]]; then
 	for USER in $(cat $ALLUSER); do
 		ID=$(grep $USER $USERLIST | awk -F":" '{printf $1}')
 		NAME=$(grep $USER $USERLIST | awk -F":" '{printf $2}')
