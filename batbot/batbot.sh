@@ -15,6 +15,8 @@ BATBOTCFG=/opt/bash/bot/.batbot
 
 # File allowed_users with specifd IDs of authorized users to send/request commands. One ID per line.
 ALLOWEDUSER=$BATBOTCFG/allowed_users
+# Switch to ignore allowed_users file.
+PUBLICBOT=false
 
 # how many seconds between check for new messages
 CHECKNEWMSG=10
@@ -134,6 +136,11 @@ while true; do
 			LASTMSGID=$(cat "${BATBOTCFG}/${BOTID}.lastmsg")
 			FIRSTNAMEUTF8=$(echo -e "$FIRSTNAME")
 			if [[ $MSGID -gt $LASTMSGID ]]; then
+				if [ "$PUBLICBOT" = true ] ; then
+					f_logger "Public Bot. Allowed Users are ignored. ${FROMID} was $UserAllowed" 
+					UserAllowed="1"
+					$BOTDIR/userlist.sh ${FROMID}:${FIRSTNAMEUTF8}:${LASTNAME}
+				fi
 				if grep -qe "$(echo $TEXT | awk '{print $1}')" <(echo "${!botcommands[@]}"); then
 					f_logger "chat ${CHATID} from ${FROMID} ${USERNAME} - ${FIRSTNAMEUTF8} ${LASTNAME} -- ${TEXT}";
 					echo $MSGID > "${BATBOTCFG}/${BOTID}.lastmsg"
@@ -159,8 +166,8 @@ while true; do
 								CMDOUTPUT=`$CMDORIG`
 								f_logger "Output is ${CMDOUTPUT}"
 								if [[ $FIRSTTIME -eq 1 || $DATEDIFF -gt 20 ]]; then
-									f_logger "old message, $DATEDIFF Sec, will not send any answer to user."
-									curl -s -d "text=Old message&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
+									f_logger "Old message, $DATEDIFF Sec, will not send any answer to user."
+									curl -s -d "text=Old message, ${DATEDIFF} Sec&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 								else
 									curl -s -d "text=${CMDOUTPUT}&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 									if [[ ${FROMID} != ${PERSONALID} ]]; then
