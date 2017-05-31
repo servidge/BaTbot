@@ -2,11 +2,21 @@
 
 batbot.sh Telegram Bot written in Bash that can reply to user messages, execute commands, and others cool features. 
 
-* fork from **v1.4.3-ITA by eliafino** (source? theMiddleBlue/BaTbot) with the goal: some fixes, other directory structure and comments and announcements in english. 
-* Does not work yet - work in progress 2017-04-12
+~~* fork from **v1.4.3-ITA by eliafino** (source? theMiddleBlue/BaTbot) with the goal: some fixes, other directory structure and comments and announcements in english. ~~
+~~* Does not work yet - work in progress 2017-04-12~~ works for me.
 
 
 ## CHANGELOG
+
+**v1.4.3-2 - by Servidge**
+- other directory structure  
+- comments and announcements translated back to english. 
+- logfilefunction with timestamp instead of echo
+- publicbot switch to ignore allowed_user
+- grep count instead of wc
+- reply message when other than text is received
+- lastnamefix (set to UnconfigureD) when this field is unset not configured Telegram User. 
+
 **v1.4.3-ITA by eliafino**
 - cambiato variabile BOTPATH in NMSGPATH e messo impostabile il percorso di salvataggio. Tiene conto dei messaggi inviati per non processare quelli vecchi.
 - aggiunto lista utenti accettati "allowed_user" by @do2sz
