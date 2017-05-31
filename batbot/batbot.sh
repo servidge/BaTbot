@@ -1,7 +1,7 @@
 ﻿#!/bin/bash
 
 # BaTbot current version
-VERSION="1.4.3-2 - by Servidge"
+VERSION="1.4.4 - by Servidge"
 
 # default Bot token 
 TELEGRAMTOKEN="<your telegram token>";
@@ -79,6 +79,13 @@ if [ -e "$BATBOTCFG/$BOTID.lastmsg" ]; then
 else
 	touch $BATBOTCFG/$BOTID.lastmsg
 	FIRSTTIME=1;
+fi
+
+if [ "$PUBLICBOT" = true ] ; then
+	f_logger "+++" 
+	f_logger "+++ Public Bot. Allowed Users are ignored. " 
+	f_logger "+++ be careful." 
+	f_logger "+++" 
 fi
 
 f_logger "Done. Waiting for new messages..."

@@ -8,7 +8,7 @@ batbot.sh Telegram Bot written in Bash that can reply to user messages, execute 
 
 ## CHANGELOG
 
-**v1.4.3-2 - by Servidge**
+**v1.4.4 - by Servidge**
 - other directory structure  
 - comments and announcements translated back to english. 
 - logfilefunction with timestamp instead of echo
