@@ -1,7 +1,8 @@
 #!/bin/bash
-
-ALLUSER=.batbot/allowed_users
-ALLSUPUSER=.batbot/allowed_superusers
+BOTDIR=/opt/bash/bot
+BATBOTCFG=$BOTDIR/.batbot
+ALLUSER=$BATBOTCFG/allowed_users
+ALLSUPUSER=$BATBOTCFG/allowed_superusers
 
 if [[ $(grep -c -x "$1" $ALLSUPUSER) -eq 1 ]]; then
 	if [[ $(grep -c -x "$2" $ALLUSER) -eq 1 ]]; then

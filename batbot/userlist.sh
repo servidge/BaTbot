@@ -1,8 +1,9 @@
 #!/bin/bash
+BOTDIR=/opt/bash/bot
+BATBOTCFG=$BOTDIR/.batbot
+USERLIST=$BATBOTCFG/user_list
 
 #USER="$@"
-USERLIST=.batbot/user_list
-
 #ID=$(echo $USER | awk -F":" '{printf $1}')
 #NAME=$(echo $USER | awk -F":" '{printf $2}')
 if [[ $@ =~ (.*)":"(.*) ]]; then
