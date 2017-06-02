@@ -20,6 +20,8 @@ PUBLICBOT=false
 
 # how many seconds between check for new messages
 CHECKNEWMSG=10
+CHECKBRAKE=1
+CHECKINTER=2
 
 # Logfilefunction
 LOGFILE=$BOTDIR/logtextfile.txt
@@ -172,7 +174,7 @@ while true; do
 								f_logger "Command ${s} received, running cmd: ${CMDORIG}"
 								CMDOUTPUT=`$CMDORIG`
 								f_logger "Output is ${CMDOUTPUT}"
-								if [[ $FIRSTTIME -eq 1 || $DATEDIFF -gt 20 ]]; then
+								if [[ $FIRSTTIME -eq 1 || $DATEDIFF -gt $(($CHECKNEWMSG * 2 + 15 )) ]]; then
 									f_logger "Old message, $DATEDIFF Sec, will not send any answer to user."
 									curl -s -d "text=Old message, ${DATEDIFF} Sec&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 								else
@@ -224,6 +226,17 @@ while true; do
 
 	FIRSTTIME=0;
 
+	NEWID=$(cat "${BATBOTCFG}/${BOTID}.lastmsg")
+	if [[ "$NEWID" != $LASTID ]]; then
+		CHECKNEWMSG=5
+	fi
+	LASTID=$NEWID
+			CHECKNEWMSG=$((CHECKNEWMSG+1))
+			CHECKBRAKE=1
+		else
+			CHECKBRAKE=$((CHECKBRAKE+1))
+		fi
+	fi
 	read -t $CHECKNEWMSG answer
 	if [[ "$answer" =~ ^\.msg.([\-0-9]+).(.*) ]]; then
 		CHATID=${BASH_REMATCH[1]}
