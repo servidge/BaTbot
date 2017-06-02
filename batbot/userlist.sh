@@ -14,3 +14,4 @@ if [[ $@ =~ (.*)":"(.*) ]]; then
 		echo "$ID:$NAME" >> $USERLIST
 	fi
 fi
+echo "Hello @FIRSTNAME"
