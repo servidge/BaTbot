@@ -22,6 +22,8 @@ PUBLICBOT=false
 CHECKNEWMSG=10
 CHECKBRAKE=1
 CHECKINTER=2
+CHECKMIN=5
+CHECKMAX=45
 
 # Logfilefunction
 LOGFILE=$BOTDIR/logtextfile.txt
@@ -228,15 +230,18 @@ while true; do
 
 	NEWID=$(cat "${BATBOTCFG}/${BOTID}.lastmsg")
 	if [[ "$NEWID" != $LASTID ]]; then
-		CHECKNEWMSG=5
+		CHECKNEWMSG=$CHECKMIN
 	fi
 	LASTID=$NEWID
+	if [[ "$CHECKNEWMSG" -lt $CHECKMAX ]]; then
+		if [[ "$CHECKBRAKE" -ge $CHECKINTER ]]; then
 			CHECKNEWMSG=$((CHECKNEWMSG+1))
 			CHECKBRAKE=1
 		else
 			CHECKBRAKE=$((CHECKBRAKE+1))
 		fi
 	fi
+
 	read -t $CHECKNEWMSG answer
 	if [[ "$answer" =~ ^\.msg.([\-0-9]+).(.*) ]]; then
 		CHATID=${BASH_REMATCH[1]}
