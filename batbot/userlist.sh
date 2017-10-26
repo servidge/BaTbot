@@ -1,5 +1,5 @@
 #!/bin/bash
-BOTDIR=/opt/bash/bot
+BOTDIR="$( cd "$( dirname "$0" )" && pwd )"
 BATBOTCFG=$BOTDIR/.batbot
 USERLIST=$BATBOTCFG/user_list
 

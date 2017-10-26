@@ -10,8 +10,8 @@ TELEGRAMTOKEN="<your telegram token>";
 PERSONALID="admin/owner ID"
 
 # Bot Directory
-BOTDIR=/opt/bash/bot
-BATBOTCFG=/opt/bash/bot/.batbot
+BOTDIR="$( cd "$( dirname "$0" )" && pwd )"
+BATBOTCFG=$BOTDIR/.batbot
 
 # File allowed_users with specifd IDs of authorized users to send/request commands. One ID per line.
 ALLOWEDUSER=$BATBOTCFG/allowed_users
@@ -43,15 +43,16 @@ echo "$TIMESTAMP $*" >> $LOGFILE
 # Use the function / setcommands in BotFather
 declare -A botcommands=(
 	["notextmessage"]="echo Message Type not supported, just text"
-	["/start"]='exec /opt/bash/bot/userlist.sh @USERID:@FIRSTNAME:@LASTNAME'
+	["/start"]='exec ./userlist.sh @USERID:@FIRSTNAME:@LASTNAME'
 	["/myid"]='echo Your user id is: @USERID'
 	["/myuser"]='echo Your username is: @USERNAME'
 	["/whoami"]="echo User id is: @USERID, Username is: @@USERNAME, Firstname: \"@FIRSTNAME\", Lastname: \"@LASTNAME\" "
 	["/ping ([a-zA-Z0-9]+)"]='echo Pong: @R1'
 	["/uptime"]="uptime"
-	["/add ([0-9]+)"]='exec /opt/bash/bot/admadduser.sh @USERID @R1'
-	["/del ([0-9]+)"]='exec /opt/bash/bot/admdeluser.sh @USERID @R1'
-	["/listuser"]='exec /opt/bash/bot/admlistuser.sh @USERID'
+	["/add ([0-9]+)"]='exec ./admadduser.sh @USERID @R1'
+	["/del ([0-9]+)"]='exec ./admdeluser.sh @USERID @R1'
+	["/listuser"]='exec ./admlistuser.sh @USERID'
+	["/photo"]='exec ./telegrampic2_uid-bot.sh @USERID image.jpeg'
 #	["/run (.*)"]="exec @R1"
 )
 
