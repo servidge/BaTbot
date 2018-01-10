@@ -247,10 +247,12 @@ while true; do
 	if [[ "$answer" =~ ^\.msg.([\-0-9]+).(.*) ]]; then
 		CHATID=${BASH_REMATCH[1]}
 		MSGSEND=${BASH_REMATCH[2]}
+		f_logger "DEBUG: ###############################################1."
 		curl -s -d "text=${MSGSEND}&chat_id=${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 	elif [[ "$answer" =~ ^\.msg.([a-zA-Z]+).(.*) ]]; then
 		CHATID=${BASH_REMATCH[1]}
 		MSGSEND=${BASH_REMATCH[2]}
+		f_logger "DEBUG: ###############################################2."
 		curl -s -d "text=${MSGSEND}&chat_id=@${CHATID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 	fi
 
