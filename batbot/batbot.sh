@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 # BaTbot current version
 VERSION="1.4.4 - by Servidge"
