@@ -43,7 +43,7 @@ echo "$TIMESTAMP $*" >> $LOGFILE
 # Use the function / setcommands in BotFather
 declare -A botcommands=(
 	["notextmessage"]="echo Message Type not supported, just text"
-	["/start"]='exec ./userlist.sh @USERID:@FIRSTNAME:@LASTNAME'
+	["/start"]='exec ./userlist.sh @USERID:@FIRSTNAME:@LASTNAME:@USERNAME'
 	["/myid"]='echo Your user id is: @USERID'
 	["/myuser"]='echo Your username is: @USERNAME'
 	["/whoami"]="echo User id is: @USERID, Username is: @@USERNAME, Firstname: \"@FIRSTNAME\", Lastname: \"@LASTNAME\" "
@@ -151,7 +151,7 @@ while true; do
 				if [ "$PUBLICBOT" = true ] ; then
 					f_logger "Public Bot. Allowed Users are ignored. ${FROMID} was $UserAllowed" 
 					UserAllowed="1"
-					$BOTDIR/userlist.sh ${FROMID}:${FIRSTNAMEUTF8}:${LASTNAME}
+					$BOTDIR/userlist.sh ${FROMID}:${FIRSTNAMEUTF8}:${LASTNAME}:${USERNAME}
 				fi
 				if grep -qe "$(echo $TEXT | awk '{print $1}')" <(echo "${!botcommands[@]}"); then
 					f_logger "chat ${CHATID} from ${FROMID} ${USERNAME} - ${FIRSTNAMEUTF8} ${LASTNAME} -- ${TEXT}";
@@ -199,7 +199,7 @@ while true; do
 										curl -s -d "text=User is not enabled: ${s} received from ${FIRSTNAMEUTF8} ${FROMID}&chat_id=${PERSONALID}" "https://api.telegram.org/bot${TELEGRAMTOKEN}/sendMessage" > /dev/null
 									fi
 									if [[ ${s} == "/start" ]]; then
-										$BOTDIR/userlist.sh ${FROMID}:${FIRSTNAMEUTF8}:${LASTNAME}
+										$BOTDIR/userlist.sh ${FROMID}:${FIRSTNAMEUTF8}:${LASTNAME}:${USERNAME}
 									fi
 								fi
 							fi
